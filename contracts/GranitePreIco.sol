@@ -52,13 +52,16 @@ contract Ownable {
 }
 
 contract GranitePreICO is Ownable {
-
     using SafeMath for uint;
-    uint public coinPrice = 5 finney; // 50% sale
-
-    mapping(address => uint256) balances;
+    string public constant name = "Granite Learning Coin";
+    string public constant symbol = "GLC";
+    uint public coinPrice = 10 finney;
+    uint public bonus = 50;
+    uint public decimals = 18;
     uint public totalSupply = 0;
     bool public isActive = true;
+    
+    mapping(address => uint256) balances;
 
     event Paid(address indexed from, uint value);
 
@@ -68,9 +71,9 @@ contract GranitePreICO is Ownable {
 
     function receiveETH() internal {
         require(isActive); // can receive ETH only if pre-ICO is active
-        require(msg.value >= coinPrice);  // minimum invest is 1 coin
 
-        uint coinsCount = msg.value.div(coinPrice); // how many coins inversor wants to buy
+        uint coinsCount = msg.value.div(coinPrice); // counts ammount
+        coinsCount = coinsCount.add(coinsCount.div(100).mul(bonus)); 
 
         balances[msg.sender] += coinsCount;
         totalSupply += coinsCount;
@@ -78,14 +81,19 @@ contract GranitePreICO is Ownable {
         Paid(msg.sender, coinsCount);
     }
 
-    function balanceOf(address addr) constant returns(uint256)
+    function balanceOf(address _addr) constant returns(uint256)
     {
-        return balances[addr];
+        return balances[_addr];
     }
 
     function setCoinPrice(uint _value) onlyOwner {
         require(_value > 0);
         coinPrice = _value;
+    }
+
+    function setBonus(uint _value) onlyOwner {
+        require(_value >= 0 && _value <= 100);
+        bonus = _value;
     }
 
     function setActive(bool _value) onlyOwner {
