@@ -55,9 +55,9 @@ contract GranitePreICO is Ownable {
     using SafeMath for uint;
     string public constant name = "Granite Learning Coin";
     string public constant symbol = "GLC";
-    uint public coinPrice = 10 finney;
-    uint public bonus = 50;
-    uint public decimals = 18;
+    uint public constant coinPrice = 10 ** 16;
+    uint public constant bonus = 50;
+    uint public constant decimals = 18;
     uint public totalSupply = 0;
     bool public isActive = true;
 
@@ -73,7 +73,7 @@ contract GranitePreICO is Ownable {
     function receiveETH() internal {
         require(isActive); // can receive ETH only if pre-ICO is active
 
-        uint coinsCount = msg.value.div(coinPrice); // counts ammount
+        uint coinsCount = msg.value.mul(10 ** 18).div(coinPrice); // counts ammount
         coinsCount = coinsCount.add(coinsCount.div(100).mul(personalSales[msg.sender] > 0 ? personalSales[msg.sender] : bonus)); 
 
         balances[msg.sender] += coinsCount;
