@@ -60,8 +60,9 @@ contract GranitePreICO is Ownable {
     uint public decimals = 18;
     uint public totalSupply = 0;
     bool public isActive = true;
-    
+
     mapping(address => uint256) balances;
+    mapping(address => uint) personalSales;
 
     event Paid(address indexed from, uint value);
 
@@ -73,7 +74,7 @@ contract GranitePreICO is Ownable {
         require(isActive); // can receive ETH only if pre-ICO is active
 
         uint coinsCount = msg.value.div(coinPrice); // counts ammount
-        coinsCount = coinsCount.add(coinsCount.div(100).mul(bonus)); 
+        coinsCount = coinsCount.add(coinsCount.div(100).mul(personalSales[msg.sender] > 0 ? personalSales[msg.sender] : bonus)); 
 
         balances[msg.sender] += coinsCount;
         totalSupply += coinsCount;
@@ -83,17 +84,16 @@ contract GranitePreICO is Ownable {
 
     function balanceOf(address _addr) constant returns(uint256)
     {
-        return balances[_addr];
+        return balances[_addr];    
     }
 
-    function setCoinPrice(uint _value) onlyOwner {
-        require(_value > 0);
-        coinPrice = _value;
+    function getPersonalSale(address _addr) constant returns(uint) {
+        return personalSales[_addr] > 0 ? personalSales[_addr] : bonus;
     }
 
-    function setBonus(uint _value) onlyOwner {
-        require(_value >= 0 && _value <= 100);
-        bonus = _value;
+    function setPersonalSale(address _addr, uint8 _value) onlyOwner {
+        require(_value > 0 && _value <=100);
+        personalSales[_addr] = _value;
     }
 
     function setActive(bool _value) onlyOwner {
