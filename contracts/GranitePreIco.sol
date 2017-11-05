@@ -53,8 +53,8 @@ contract Ownable {
 
 contract GranitePreICO is Ownable {
     using SafeMath for uint;
-    string public constant name = "Granite Learning Coin";
-    string public constant symbol = "GLC";
+    string public constant name = "Pre-ICO Granite Learning Coin";
+    string public constant symbol = "PGLC";
     uint public constant coinPrice = 10 ** 16;
     uint public constant bonus = 50;
     uint public constant decimals = 18;
