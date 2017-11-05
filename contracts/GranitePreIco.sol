@@ -59,9 +59,9 @@ contract GranitePreICO is Ownable {
     string public constant name = "Pre-ICO Granite Learning Coin";
     string public constant symbol = "PGLC";
     uint public constant coinPrice = 25 * 10 ** 14;
-    uint public constant minAmmount = 10 ** 16;
     uint public constant bonus = 50;
     uint public constant decimals = 18;
+    uint public minAmmount = 10 ** 18;
     uint public totalSupply = 0;
     bool public isActive = true;
     uint public investorsCount = 0;
@@ -124,6 +124,11 @@ contract GranitePreICO is Ownable {
 
     function setActive(bool _value) onlyOwner public {
         isActive = _value;
+    }
+    
+    function setMinAmmount(uint ammount) onlyOwner public {
+        require(ammount > 0);
+        minAmmount = ammount;
     }
 
     function drain() onlyOwner public {
