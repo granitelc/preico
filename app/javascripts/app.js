@@ -64,6 +64,13 @@ window.App.start =  function() {
 
         GranitePreIco.deployed()
         .then(function(instance) {
+            if (App.Deployed) {
+                App.Deployed();
+            }
+            self.refreshBalance();
+            setInterval(function() {
+                self.refreshBalance();
+            }, 1000);
             return instance.coinPrice.call(account);
         }).then(function(coinPrice) {
             GranitePreIco.deployed()
@@ -85,12 +92,11 @@ window.App.start =  function() {
                     coinsInput.value = ethInput.value / ethPerCoin;
                 })
             })
+        }).catch(function(err) {
+            if (App.DeployedError) {
+                App.DeployedError(err);
+            }
         })
-        self.refreshBalance();
-
-        setInterval(function() {
-            self.refreshBalance();
-        }, 1000);
     });
 }
 
