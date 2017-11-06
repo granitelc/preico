@@ -15,13 +15,15 @@
   <h3>You already have <span class="black"><span id="balance"></span> GLC</span>
   </h3>
   <h3>1 ETH = 200 GLC (+50% pre-ICO bonus)</h3>
-
   <div>
-    GLC: <input type="number" min="1" step="1" id="coins" placeholder="coins" value="200">
+    <select name="account"></select>
+  </div>
+  <div>
+    GLC: <input type="text" min="1" step="1" name="coin_ammount" placeholder="coins" >
   </div>
   <div>
     ETH:
-    <input type="number" id="eth" min="0" placeholder="eth" value="1">
+    <input type="text" name="eth_ammount"  placeholder="eth">
   </div>
   <br/>
   <button id="send" onclick="App.send()">Buy Tokens</button>
