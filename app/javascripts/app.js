@@ -55,11 +55,11 @@ window.App.start =  function() {
         });
 
         coinsInput.addEventListener("input", function(e) {
-            ethInput.value = parseInt(e.target.value) * ethPerCoin;
+            ethInput.value = e.target.value == '' ? '' : parseInt(e.target.value) * ethPerCoin;
         });
 
         ethInput.addEventListener("input", function(e) {
-            coinsInput.value = parseFloat(e.target.value) / ethPerCoin;
+            coinsInput.value = e.target.value == '' ? '' : parseFloat(e.target.value) / ethPerCoin;
         });
 
         GranitePreIco.deployed()
@@ -130,24 +130,24 @@ window.App.refreshBalance = function() {
         });
 }
 
-window.App.send =  function(success) {
+window.App.send =  function() {
     var self = this;
     var amount = parseFloat(ethInput.value);
-
-    GranitePreIco.deployed().then(function(instance) {
-        instance
-            .sendTransaction({
-                from: web3.eth.accounts[0],
-                to: instance.address,
-                value: web3.toWei(amount, "ether")
-            })
-            .then(function(e) {
-                console.log(e);
-                if (success) {
-                    success(e);
-                }
-            });
-    });
+    return new Promise((resolve, reject)=>{
+        GranitePreIco.deployed().then(function(instance) {
+            instance
+                .sendTransaction({
+                    from: web3.eth.accounts[0],
+                    to: instance.address,
+                    value: web3.toWei(amount, "ether")
+                })
+                .then(function(e) {  
+                    resolve(e);                    
+                }).catch(function(e) {
+                    reject(e);
+                })
+        });
+    })
 }
 
 window.addEventListener("load", function() {

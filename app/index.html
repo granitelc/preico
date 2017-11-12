@@ -5,6 +5,19 @@
   <title>Granite Pre ICO</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <script src="./app.js"></script>
+
+  <script>
+    function send() {
+      App.send()
+      .then(function() {
+        alert('OK');
+      })
+      .catch(function() {
+        alert('Deny');
+      })
+    }
+  
+  </script>
 </head>
 
 <body>
@@ -26,7 +39,7 @@
     <input type="text" name="eth_ammount"  placeholder="eth">
   </div>
   <br/>
-  <button id="send" onclick="App.send()">Buy Tokens</button>
+  <button id="send" onclick="send()">Buy Tokens</button>
 
   <br/>
   <br/> Or You can send ETH to
