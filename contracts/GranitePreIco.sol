@@ -65,6 +65,7 @@ contract GranitePreICO is Ownable {
     uint public totalSupply = 0;
     bool public isActive = true;
     uint public investorsCount = 0;
+    uint public constant hardCap = 250000 * 10 ** 18;
 
     mapping(address => uint256) balances;
     mapping(address => uint) personalSales;
@@ -81,14 +82,16 @@ contract GranitePreICO is Ownable {
         
         require(msg.value >= minAmmount);
         
+        uint coinsCount = msg.value.div(coinPrice).mul(10 ** 18); // counts ammount
+        coinsCount = coinsCount.add(coinsCount.div(100).mul(personalSales[msg.sender] > 0 ? personalSales[msg.sender] : bonus)); // bonus
+
+        require((totalSupply + coinsCount) <= hardCap);
+
         if (balances[msg.sender] == 0) {
             investors[investorsCount] = msg.sender;
             investorsCount++;
         }
 
-        uint coinsCount = msg.value.mul(10 ** 18).div(coinPrice); // counts ammount
-        coinsCount = coinsCount.add(coinsCount.div(100).mul(personalSales[msg.sender] > 0 ? personalSales[msg.sender] : bonus)); 
-    
         balances[msg.sender] += coinsCount;
         totalSupply += coinsCount;
 
@@ -109,13 +112,13 @@ contract GranitePreICO is Ownable {
         personalSales[_addr] = _value;
     }
  
-    function getInverstorAddress(uint index) constant public returns(address)
+    function getInvestorAddress(uint index) constant public returns(address)
     {
         require(investorsCount > index);
         return investors[index];
     }
     
-    function getInverstorBalance(uint index) constant public returns(uint256) 
+    function getInvestorBalance(uint index) constant public returns(uint256) 
     {
         address addr = investors[index];
         require(addr != 0);
