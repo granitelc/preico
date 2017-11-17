@@ -36,6 +36,15 @@ contract('GranitePreIco', function(accounts) {
                     to: inst.address,
                     value: web3.toWei(1, "ether")
                 }))
+        }).then(function() {
+            return inst.setMinAmmount(web3.toWei(1,"ether"), {from: accounts[0]})
+        }).then(function() {
+            return inst
+                .sendTransaction({
+                    from: accounts[0],
+                    to: inst.address,
+                    value: web3.toWei(1, "ether")
+                })
         })
     })
 });
