@@ -56,19 +56,19 @@ contract Ownable {
 
 contract GranitePreICO is Ownable {
     using SafeMath for uint;
-    string public constant name = "Pre-ICO Granite Learning Coin";
+    string public constant name = "Pre-ICO Granite Labor Coin";
     string public constant symbol = "PGLC";
     uint public constant coinPrice = 25 * 10 ** 14;
-    uint public constant bonus = 50;
     uint public constant decimals = 18;
-    uint public minAmmount = 10 ** 18;
+    uint public constant bonus = 50;
+    uint public minAmount = 10 ** 18;
     uint public totalSupply = 0;
     bool public isActive = true;
     uint public investorsCount = 0;
     uint public constant hardCap = 250000 * 10 ** 18;
 
     mapping(address => uint256) balances;
-    mapping(address => uint) personalSales;
+    mapping(address => uint) personalBonuses;
     mapping(uint => address) investors;
 
     event Paid(address indexed from, uint value);
@@ -80,10 +80,10 @@ contract GranitePreICO is Ownable {
     function receiveETH() internal {
         require(isActive); // can receive ETH only if pre-ICO is active
         
-        require(msg.value >= minAmmount);
+        require(msg.value >= minAmount);
         
-        uint coinsCount = msg.value.div(coinPrice).mul(10 ** 18); // counts ammount
-        coinsCount = coinsCount.add(coinsCount.div(100).mul(personalSales[msg.sender] > 0 ? personalSales[msg.sender] : bonus)); // bonus
+        uint coinsCount = msg.value.div(coinPrice).mul(10 ** 18); // counts amount
+        coinsCount = coinsCount.add(coinsCount.div(100).mul(personalBonuses[msg.sender] > 0 ? personalBonuses[msg.sender] : bonus)); // bonus
 
         require((totalSupply + coinsCount) <= hardCap);
 
@@ -103,13 +103,13 @@ contract GranitePreICO is Ownable {
         return balances[_addr];    
     }
 
-    function getPersonalSale(address _addr) constant public returns(uint) {
-        return personalSales[_addr] > 0 ? personalSales[_addr] : bonus;
+    function getPersonalBonus(address _addr) constant public returns(uint) {
+        return personalBonuses[_addr] > 0 ? personalBonuses[_addr] : bonus;
     }
 
-    function setPersonalSale(address _addr, uint8 _value) onlyOwner public {
+    function setPersonalBonus(address _addr, uint8 _value) onlyOwner public {
         require(_value > 0 && _value <=100);
-        personalSales[_addr] = _value;
+        personalBonuses[_addr] = _value;
     }
  
     function getInvestorAddress(uint index) constant public returns(address)
@@ -129,9 +129,9 @@ contract GranitePreICO is Ownable {
         isActive = _value;
     }
     
-    function setMinAmmount(uint ammount) onlyOwner public {
-        require(ammount > 0);
-        minAmmount = ammount;
+    function setMinAmount(uint amount) onlyOwner public {
+        require(amount > 0);
+        minAmount = amount;
     }
 
     function drain() onlyOwner public {

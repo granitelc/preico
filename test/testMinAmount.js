@@ -11,7 +11,7 @@ chai.use(chaiAsPromised);
 
 contract('GranitePreIco', function(accounts) {
 
-    it("Check check min ammount assertion", function() {
+    it("Check check min amount assertion", function() {
         var inst;
         return GranitePreIco.deployed().then(function(instance) {
             inst  = instance;
@@ -28,7 +28,7 @@ contract('GranitePreIco', function(accounts) {
                 to: inst.address,
                 value: web3.toWei(1, "ether")})
         }).then(function() {
-            return inst.setMinAmmount(web3.toWei(2,"ether"), {from: accounts[0]})
+            return inst.setMinAmount(web3.toWei(2,"ether"), {from: accounts[0]})
         }).then(function() {
             return chai.assert.isRejected(inst
                 .sendTransaction({
@@ -37,7 +37,7 @@ contract('GranitePreIco', function(accounts) {
                     value: web3.toWei(1, "ether")
                 }))
         }).then(function() {
-            return inst.setMinAmmount(web3.toWei(1,"ether"), {from: accounts[0]})
+            return inst.setMinAmount(web3.toWei(1,"ether"), {from: accounts[0]})
         }).then(function() {
             return inst
                 .sendTransaction({

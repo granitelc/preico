@@ -13,10 +13,10 @@ contract('GranitePreIco', function(accounts) {
         var inst;
         return GranitePreIco.deployed().then(function(instance) {
             inst = instance;
-            return inst.setPersonalSale(accounts[1], 90, {from: accounts[0]});
+            return inst.setPersonalBonus(accounts[1], 90, {from: accounts[0]});
         })
         .then(function() {
-            return inst.getPersonalSale.call(accounts[1]).then(function(pb) {
+            return inst.getPersonalBonus.call(accounts[1]).then(function(pb) {
                 assert.isTrue(pb.equals(90));
             });
         })

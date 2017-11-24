@@ -4,39 +4,75 @@
 <head>
   <title>Granite Pre ICO</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-  <script src="./app.js"></script>
-
+  <script src="./granite.js"></script>
   <script>
+
+    var investor;
+
     function send() {
-      App.send()
-      .then(function() {
-        alert('OK');
-      })
-      .catch(function() {
-        alert('Deny');
-      })
+        var amount = document.getElementsByName("eth_amount")[0].value;
+        investor.SendETH(amount);
     }
-  
+    function setInvestor(instance, account) {
+      investor = instance.Investor(account);
+      if (investor) {
+        investor.GetBalance().then(function(balance) {
+          document.getElementById("balance").innerHTML = balance;
+        })
+        investor.GetBonus().then(function(bonus) {
+          document.getElementById("bonus").innerHTML = bonus;
+        })
+
+        investor.GetCoinsPerETH().then(function(cpe) {
+          document.getElementById("coins_per_eth").innerHTML = cpe;
+        })
+      }
+    }
+
+    function setAccounts(instance) {
+      var accountSelect = document.getElementsByName("account")[0];
+      for (var i = 0; i < accountSelect.options.length; ++i) {
+          accountSelect.remove(i);
+      }
+      var accounts = instance.GetAccounts();
+      for (var i in accounts) {
+          var opt = document.createElement("option");
+          opt.text = accounts[i];
+          opt.value = accounts[i];
+          accountSelect.appendChild(opt);
+      };
+
+      accountSelect.addEventListener("change", function(e) {
+          investor = instance.Investor(instance, e.target.value)
+      })
+      setInvestor(instance, accounts[0])
+    }
+
+    window.addEventListener("load",  function() {
+        window.Granite.Start().then(function(preICO) {
+            setAccounts(preICO);
+        })
+    });
   </script>
 </head>
 
-<body>
+<body >
   <h1>Granite Pre-ICO</h1>
   <br/>
   <h2>Total pre-ICO Supply <span class="black"><span id="totalsupply"></span> GLC</span>
   </h2>
   <h3>You already have <span class="black"><span id="balance"></span> GLC</span>
   </h3>
-  <h3>1 ETH = 200 GLC (+50% pre-ICO bonus)</h3>
+  <h3>1 ETH = <span id="coins_per_eth"></span> GLC (+<span id="bonus"></span>)% pre-ICO bonus)</h3>
   <div>
     <select name="account"></select>
   </div>
   <div>
-    GLC: <input type="text" min="1" step="1" name="coin_ammount" placeholder="coins" >
+    PGLC: <input type="text" min="1" step="1" name="coin_amount" placeholder="coins" >
   </div>
   <div>
     ETH:
-    <input type="text" name="eth_ammount"  placeholder="eth">
+    <input type="text" name="eth_amount"  placeholder="eth">
   </div>
   <br/>
   <button id="send" onclick="send()">Buy Tokens</button>
