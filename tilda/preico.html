@@ -1,0 +1,96 @@
+<script src="https://cdn.rawgit.com/rowdyroad/f58083b41ccfb68dc01c28532d3ba7a8/raw/10c6f5322bba63c0af11a78f437e299ee27d14ad/preico-12.11.2017-18.09.js"></script>
+<script>
+    var minEthAmmount = 1;
+    var minCoinAmmount = 600;
+    window.confirmed = false;
+    window.App.UpdateBalance = function(balance) {
+        $("div[field=tn_text_1510009222612]").html("Ваш баланс: " + Math.round(balance / 1000000000000000000) + " PGLC");
+    }
+    window.App.UpdateEthPerCoin = function(ethPerCoin) {
+        minCoinAmmount = Math.round(1.0 / ethPerCoin);
+        var text = "1 ETH = " + minCoinAmmount + " PGLC";
+        $(".tn-elem__363748511508920925672 > div").html(text);
+        $("div[field=li_text__1502723669642] > div > span > span").first().html(text);
+    }
+    window.App.UpdateBonus = function(bonus) {
+        $(".tn-elem__363748511508920960607 > div").html(bonus + '% бонус');
+        $($("div[field=li_text__1502723669642] > div > span > span").get(1)).html(bonus + '% бонус');
+    }
+    window.App.web3Fallback = function() {
+        $(".tn-elem__363748511508921001555").html('<div style="color: #babddd;font-size: 18px;font-family:\'Roboto\';line-height: 1.55;">Активируйте ваш ETH-кошелек и обновите страницу.</div>');
+        $("div[field=tn_text_1510009222612]").remove();
+    }
+
+    window.App.Deployed = function() {
+        $(".tn-elem__363748511508921001555, .tn-elem__363748511510009222612").show();
+    }
+
+
+    $(document).ready(function() {
+        $("input[name=eth_ammount]").on('change', function(e) {
+            if (e.target.value < minEthAmmount) {
+                $(this).val(minEthAmmount);
+                 $("input[name=coin_ammount]").val(minCoinAmmount)
+            }
+        })
+
+        $("input[name=coin_ammount]").on('change', function(e) {
+            if (e.target.value < minCoinAmmount) {
+                $(this).val(minCoinAmmount);
+                $("input[name=eth_ammount]").val(minEthAmmount)
+            }
+        })
+
+        $(".tn-elem__363748511508921001555, .tn-elem__363748511510009222612").hide();
+
+        $(".t-form__successbox").remove();
+        $("input[name=eth_ammount]").addClass("t-input_has-content");
+        $("input[name=coin_ammount]").addClass("t-input_has-content");
+        $("#rec37288818 .t-popup__close").remove();
+        var show = window.t702_showPopup;
+
+        show(37288818);
+
+
+        window.t702_showPopup = function(rec) {
+            $("input[name=eth_ammount]").val(minEthAmmount);
+            $("input[name=coin_ammount]").val(minCoinAmmount);
+            $("#form35997163 input").attr("disabled",false);
+            $("#form35997163 select").attr("disabled",false);
+            $("#form35997163 button").attr("disabled",false).removeClass('t-submit_sending').removeClass('t-btn_sending');
+            show(rec);
+        }
+
+        var close  = window.t702_closePopup;
+
+        window.t702_closePopup = function(popup) {
+            if (window.confirmed) { close(popup) };
+        }
+
+        window.t702_onSuccess = function(form) {
+            if (!window.confirmed) {
+                window.confirmed = true;
+                close(form);
+            } else {
+                var eth = $("input[name=eth_ammount]").val();
+                var coin = $("input[name=coin_ammount]").val();
+                setTimeout(function() {
+                    $("input[name=eth_ammount]").val(eth);
+                    $("input[name=coin_ammount]").val(coin);
+                }, 300);
+
+                $("#form35997163 input").attr("disabled",true);
+                $("#form35997163 select").attr("disabled",true);
+                $("#form35997163 button").attr("disabled",true).addClass('t-submit_sending').addClass('t-btn_sending');
+                App.send().then(function() {
+                    close(form);
+                }).catch(function() {
+                    alert('Внимание! Транзакция была отклонена');
+                    close(form);
+                })
+            }
+        }
+
+
+    })
+</script>
