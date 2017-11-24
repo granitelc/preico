@@ -1,96 +1,124 @@
-<script src="https://cdn.rawgit.com/rowdyroad/f58083b41ccfb68dc01c28532d3ba7a8/raw/10c6f5322bba63c0af11a78f437e299ee27d14ad/preico-12.11.2017-18.09.js"></script>
+<script src="https://cdn.rawgit.com/rowdyroad/5d20fe70f266e9a007eca8d3e51abb0e/raw/de64aa35e9a95501b0d4ad6bfa057d68e62e9153/preico-12.11.2017-09.58.js"></script>
 <script>
-    var minEthAmmount = 1;
-    var minCoinAmmount = 600;
+    var investor = null;
     window.confirmed = false;
-    window.App.UpdateBalance = function(balance) {
-        $("div[field=tn_text_1510009222612]").html("Ваш баланс: " + Math.round(balance / 1000000000000000000) + " PGLC");
+    var show = window.t702_showPopup;
+    window.t702_showPopup = function(rec) {
+        $(window.Granite.Configuration.EthAmountSelector).val(window.Granite.Configuration.MinEthAmount);
+        $(window.Granite.Configuration.CoinAmountSelector).val(window.Granite.Configuration.MinCoinAmount);
+        $("#form" + window.Granite.Configuration.FormID + " input").attr("disabled",false);
+        $("#form" + window.Granite.Configuration.FormID + " select").attr("disabled",false);
+        $("#form" + window.Granite.Configuration.FormID + " button").attr("disabled",false).removeClass('t-submit_sending').removeClass('t-btn_sending');
+        show(rec);
     }
-    window.App.UpdateEthPerCoin = function(ethPerCoin) {
-        minCoinAmmount = Math.round(1.0 / ethPerCoin);
-        var text = "1 ETH = " + minCoinAmmount + " PGLC";
-        $(".tn-elem__363748511508920925672 > div").html(text);
-        $("div[field=li_text__1502723669642] > div > span > span").first().html(text);
-    }
-    window.App.UpdateBonus = function(bonus) {
-        $(".tn-elem__363748511508920960607 > div").html(bonus + '% бонус');
-        $($("div[field=li_text__1502723669642] > div > span > span").get(1)).html(bonus + '% бонус');
-    }
-    window.App.web3Fallback = function() {
-        $(".tn-elem__363748511508921001555").html('<div style="color: #babddd;font-size: 18px;font-family:\'Roboto\';line-height: 1.55;">Активируйте ваш ETH-кошелек и обновите страницу.</div>');
-        $("div[field=tn_text_1510009222612]").remove();
+    var close  = window.t702_closePopup;
+    window.t702_closePopup = function(popup) {
+        if (window.confirmed) {
+            close(popup)
+        };
     }
 
-    window.App.Deployed = function() {
-        $(".tn-elem__363748511508921001555, .tn-elem__363748511510009222612").show();
-    }
+    window.t702_onSuccess = function(form) {
+        if (!window.confirmed) {
+            window.confirmed = true;
+            close(form);
+        } else {
+            if (!investor) {
+                close(form);
+                return
+            }
+            var eth = $(window.Granite.Configuration.EthAmountSelector).val();
+            var coin = $(window.Granite.Configuration.CoinAmountSelector).val();
+            setTimeout(function() {
+                $(window.Granite.Configuration.EthAmountSelector).val(eth);
+                $(window.Granite.Configuration.CoinAmountSelector).val(coin);
+            }, 300);
 
+            $("#form" + window.Granite.Configuration.FormID + "  input").attr("disabled",true);
+            $("#form" + window.Granite.Configuration.FormID + "  select").attr("disabled",true);
+            $("#form" + window.Granite.Configuration.FormID + "  button").attr("disabled",true).addClass('t-submit_sending').addClass('t-btn_sending');
+            investor.SendETH(eth).then(function() {
+                close(form);
+            }).catch(function() {
+                alert('Внимание! Транзакция была отклонена');
+                close(form);
+            })
+        }
+    }
 
     $(document).ready(function() {
-        $("input[name=eth_ammount]").on('change', function(e) {
-            if (e.target.value < minEthAmmount) {
-                $(this).val(minEthAmmount);
-                 $("input[name=coin_ammount]").val(minCoinAmmount)
-            }
-        })
-
-        $("input[name=coin_ammount]").on('change', function(e) {
-            if (e.target.value < minCoinAmmount) {
-                $(this).val(minCoinAmmount);
-                $("input[name=eth_ammount]").val(minEthAmmount)
-            }
-        })
-
-        $(".tn-elem__363748511508921001555, .tn-elem__363748511510009222612").hide();
-
         $(".t-form__successbox").remove();
-        $("input[name=eth_ammount]").addClass("t-input_has-content");
-        $("input[name=coin_ammount]").addClass("t-input_has-content");
-        $("#rec37288818 .t-popup__close").remove();
-        var show = window.t702_showPopup;
+        $(window.Granite.Configuration.EthAmountSelector).addClass("t-input_has-content");
+        $(window.Granite.Configuration.CoinAmountSelector).addClass("t-input_has-content");
+        $(window.Granite.Configuration.CheckPopupIDCloseBtnSelector).remove();
+        show(window.Granite.Configuration.CheckPopupID);
 
-        show(37288818);
-
-
-        window.t702_showPopup = function(rec) {
-            $("input[name=eth_ammount]").val(minEthAmmount);
-            $("input[name=coin_ammount]").val(minCoinAmmount);
-            $("#form35997163 input").attr("disabled",false);
-            $("#form35997163 select").attr("disabled",false);
-            $("#form35997163 button").attr("disabled",false).removeClass('t-submit_sending').removeClass('t-btn_sending');
-            show(rec);
-        }
-
-        var close  = window.t702_closePopup;
-
-        window.t702_closePopup = function(popup) {
-            if (window.confirmed) { close(popup) };
-        }
-
-        window.t702_onSuccess = function(form) {
-            if (!window.confirmed) {
-                window.confirmed = true;
-                close(form);
-            } else {
-                var eth = $("input[name=eth_ammount]").val();
-                var coin = $("input[name=coin_ammount]").val();
-                setTimeout(function() {
-                    $("input[name=eth_ammount]").val(eth);
-                    $("input[name=coin_ammount]").val(coin);
-                }, 300);
-
-                $("#form35997163 input").attr("disabled",true);
-                $("#form35997163 select").attr("disabled",true);
-                $("#form35997163 button").attr("disabled",true).addClass('t-submit_sending').addClass('t-btn_sending');
-                App.send().then(function() {
-                    close(form);
-                }).catch(function() {
-                    alert('Внимание! Транзакция была отклонена');
-                    close(form);
-                })
+        window.Granite.Start().then(function(preICO) {
+            function refreshBalance() {
+                investor && investor.GetBalance().then(function(balance) {
+                    $(window.Granite.Configuration.BalanceSelector).html(balance + " PGLC")
+                });
             }
-        }
+
+            function setInvestor(account) {
+                investor = preICO.Investor(account);
+                investor.GetBonus().then(function(bonus) {
+                    $(window.Granite.Configuration.BonusSelector).html(bonus + window.Granite.Configuration.BonusCaption)
+                });
+                investor.GetCoinsPerETH().then(function(cpe) {
+                    $(window.Granite.Configuration.CoinRateSelector).html("1 ETH = " + cpe + " PGLC");
+                });
+                refreshBalance();
+            }
+
+            setInvestor(preICO.GetAccounts()[0]);
+            setInterval(refreshBalance, 5000);
+            refreshBalance();
+
+            var accountSelect = $(window.Granite.Configuration.AccountSelectSelector);
+
+            accountSelect.empty();
+
+            var accs = preICO.GetAccounts();
+            for (var i in accs) {
+                accountSelect.append(new Option(accs[i],accs[i]));
+            };
+
+            accountSelect.on('change', function(e) {
+                setInvestor(e.target.value);
+            })
+
+            investor.GetCoinsPerETH().then(function(cpe) {
+                $(window.Granite.Configuration.EthAmountSelector).on('input', function(e) {
+                    $(window.Granite.Configuration.CoinAmountSelector).val(e.target.value * cpe);
+                });
+
+                $(window.Granite.Configuration.CoinAmountSelector).on('input', function(e) {
+                    $(window.Granite.Configuration.EthAmountSelector).val(1.0 * e.target.value / cpe);
+                });
+            })
+
+            $(window.Granite.Configuration.EthAmountSelector).on('change', function(e) {
+                if (e.target.value < window.Granite.Configuration.MinEthAmount) {
+                    $(this).val(window.Granite.Configuration.MinEthAmount);
+                    $(window.Granite.Configuration.CoinAmountSelector).val(window.Granite.Configuration.MinCoinAmount)
+                }
+            })
+
+            $(window.Granite.Configuration.CoinAmountSelector).on('change', function(e) {
+                if (e.target.value < window.Granite.Configuration.MinCoinAmount) {
+                    $(this).val(window.Granite.Configuration.MinCoinAmount);
+                    $(window.Granite.Configuration.EthAmountSelector).val(window.Granite.Configuration.MinEthAmount)
+                }
+            })
 
 
+
+        }).catch(function(error) {
+            $(window.Granite.Configuration.BuyTokenButtonSelector).attr("src",window.Granite.Configuration.DisabledBuyTokenButtonUrl);
+            $(window.Granite.Configuration.SubTitleBuyTokenButtonSelector).html(window.Granite.Configuration.MetaMaskBlocked);
+            $(window.Granite.Configuration.BuyTokenButtonLinkSelector).unbind('click').attr("href","javascript:void(0)")
+            console.log('Error',error)
+        })
     })
 </script>
